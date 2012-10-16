@@ -31,6 +31,8 @@ MALWAREPATROL=1
 MTC_SRI=1
 #	http://exposure.iseclab.org/malware_domains.txt
 ISECLAB=1
+#	http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive
+CLEANMX=1
 
 ## Choose which DNS server are you using, BIND of UNBOUND
 DNSSERVER="unbound" # bind or unbound
@@ -45,7 +47,12 @@ fi
 
 ## Backing up previous files.
 mv $BASE/$FOLDER_BL/master.list $BASE/$FOLDER_BL/backup/master.list.$today.txt
-mv $BASE/$FOLDER_BL/master.list.zones $BASE/$FOLDER_BL/backup/master.list.zones.$today.txt
+if [ $DNSSERVER == 'bind' ]; then
+        mv $BASE/$FOLDER_BL/master.list.zones $BASE/$FOLDER_BL/backup/master.list.zones.$today.txt
+elif [ $DNSSERVER == 'unbound' ]; then
+        mv $BASE/$FOLDER_BL/blacklisted_domains.conf $BASE/$FOLDER_BL/backup/blacklisted_domains.conf.$today.txt
+fi
+
 
 
 ##############################################
@@ -172,9 +179,21 @@ mv $BASE/$FOLDER_BL/master.list.zones $BASE/$FOLDER_BL/backup/master.list.zones.
 		rm -rf $BASE/$FOLDER_BL/iseclab.org.txt
 	fi
 
+##########################################
+#######   support.clean-mx.de/clean-mx
+##########################################
+	if [ $CLEANMX -ne 0 ]; then
+		wget -t 3 'http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive' \
+			-O $BASE/$FOLDER_BL/clean.mx.txt
+		more $BASE/$FOLDER_BL/clean.mx.txt | grep CDATA | cut -d'/' -f3 | cut -d']' -f1 |grep -v ':' \
+		 | grep -v "[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}" \
+		 | sort | uniq >> $BASE/$FOLDER_BL/master.list
+		 rm -rf $BASE/$FOLDER_BL/clean.mx.txt
+	fi
 
 ## refining records.. remove rubbish.. files are the same..
-cat $BASE/$FOLDER_BL/master.list | grep -v '<' | grep -v '>' | grep -v '#' | grep -v '//' | sed '/^$/d' | grep -v -E "\.$" > $BASE/$FOLDER_BL/master.list.tmp
+cat $BASE/$FOLDER_BL/master.list | grep -v '<' | grep -v '>' | grep -v '#' | grep -v '//' \
+	| sed '/^$/d' | grep -v -E "\.$" > $BASE/$FOLDER_BL/master.list.tmp
 rm -rf $BASE/$FOLDER_BL/master.list
 mv $BASE/$FOLDER_BL/master.list.tmp $BASE/$FOLDER_BL/master.list
 
