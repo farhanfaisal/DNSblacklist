@@ -1,0 +1,25 @@
+DNSBlacklist project. 
+
+This include domain parser from various malicious domain provider
+- http://www.malwaredomains.com/
+- https://spyeyetracker.abuse.ch/blocklist.php?download=domainblocklist
+- http://www.abuse.ch/zeustracker/blocklist.php?download=domainblocklist
+- https://palevotracker.abuse.ch/blocklists.php?download=domainblocklist
+- https://isc.sans.edu/suspicious_domains.html#lists
+- http://malc0de.com/bl/ZONES
+- http://labs.sucuri.net/?malware
+- www.malwareblacklist.com/mbl.xml
+- http://www.malwarepatrol.net/cgi/submit?action=list_bind
+- http://mtc.sri.com/live_data/malware_dns/
+- http://exposure.iseclab.org/malware_domains.txt
+- http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive
+
+Main features
+- Configurables of which domain sources to be used.
+- Choosable option for output format, Unbound or Bind DNS server
+
+The main script is preparation.sh, which generate a configuration 
+file for unbound DNS server. You can choose BIND format output as well
+
+Farhan Faisal
+http://www.farhanfaisal.com
