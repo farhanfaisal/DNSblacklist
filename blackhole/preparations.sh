@@ -238,7 +238,7 @@ if [ $DNSSERVER == "bind" ]; then
 	echo "Configuration file generated : $BASE/$FOLDER_BL/master.list.zones"
 elif [ $DNSSERVER == 'unbound' ]; then
 	rm -rf $BASE/$FOLDER_BL/blacklisted_domains.conf
-	for a in `cat $BASE/$FOLDER_BL/tmpfile.txt | grep -v '#'`; do
+	for a in `cat $BASE/$FOLDER_BL/master.list | grep -v '#'`; do
 		echo 'local-data: "'$a' A 172.16.40.226"' >> $BASE/$FOLDER_BL/blacklisted_domains.conf
 	done
 	echo "Configuration file generated : $BASE/$FOLDER_BL/blacklisted_domains.conf"
