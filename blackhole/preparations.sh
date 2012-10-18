@@ -32,12 +32,15 @@ MTC_SRI=1
 #	http://exposure.iseclab.org/malware_domains.txt
 ISECLAB=1
 #	http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive
-CLEANMX=1
+CLEANMX=0
 #	http://www.nictasoft.com/ace/malware-urls/
 NICTASOFT=1
 
 ## Choose which DNS server are you using, BIND of UNBOUND
 DNSSERVER="unbound" # bind or unbound
+
+## Delete all downloaded tmp files?
+DELETE=1
 
 ############################################################
 ############	END OF CONFIGURABLE OPTIONS ################
@@ -61,28 +64,27 @@ fi
 #########  malwaredomains.com   ##############	
 ##############################################
 	if [ $SAGADC -ne 0 ]; then
-		rm -rf $BASE/$FOLDER_BL/dns-bh.sagadc.org.txt
-		wget http://dns-bh.sagadc.org/domains.txt -O $BASE/$FOLDER_BL/dns-bh.sagadc.org.txt
-		more $BASE/$FOLDER_BL/dns-bh.sagadc.org.txt | grep -v '#' | awk '{print $2}' \
+		wget http://dns-bh.sagadc.org/domains.txt -O $BASE/$FOLDER_BL/dns-bh.sagadc.org.tmp
+		more $BASE/$FOLDER_BL/dns-bh.sagadc.org.tmp | grep -v '#' | awk '{print $2}' \
 			| cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/dns-bh.sagadc.org.txt
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/dns-bh.sagadc.org.tmp ; fi
 	fi
 
 ##################################################
 #########  spyeyetracker.abuse.ch   ##############
 ##################################################
 	if [ $SPYEYE -ne 0 ]; then
-		wget --no-check-certificate -t 3 https://spyeyetracker.abuse.ch/blocklist.php?download=domainblocklist -O $BASE/$FOLDER_BL/spyeyetracker.txt
-		cat $BASE/$FOLDER_BL/spyeyetracker.txt | grep -v '#' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/spyeyetracker.txt
+		wget --no-check-certificate -t 3 https://spyeyetracker.abuse.ch/blocklist.php?download=domainblocklist -O $BASE/$FOLDER_BL/spyeyetracker.tmp
+		cat $BASE/$FOLDER_BL/spyeyetracker.tmp | grep -v '#' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/spyeyetracker.tmp ; fi
 	fi
 ##############################################
 ##############  zeustracker   ################
 ##############################################
 	if [ $ZEUSTRACKER -ne 0 ]; then
-		wget -t 3 http://www.abuse.ch/zeustracker/blocklist.php?download=domainblocklist -O $BASE/$FOLDER_BL/zeustracker.txt
-		cat $BASE/$FOLDER_BL/zeustracker.txt | grep -v '#' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/zeustracker.txt
+		wget -t 3 http://www.abuse.ch/zeustracker/blocklist.php?download=domainblocklist -O $BASE/$FOLDER_BL/zeustracker.tmp
+		cat $BASE/$FOLDER_BL/zeustracker.tmp | grep -v '#' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/zeustracker.tmp ; fi
 	fi
 	
 ##############################################
@@ -91,7 +93,7 @@ fi
 	if [ $PALEVOTRACKER -ne 0 ]; then
 		wget --no-check-certificate -t 3 https://palevotracker.abuse.ch/blocklists.php?download=domainblocklist -O palevotracker.tmp
 		cat $BASE/$FOLDER_BL/palevotracker.tmp | grep -v '#' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/palevotracker.tmp
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/palevotracker.tmp ; fi
 	fi
 
 #######################################################################
@@ -99,18 +101,20 @@ fi
 #######################################################################
 	if [ $ISCSANS -ne 0 ]; then
 		#wget -t 3 http://isc.sans.edu/feeds/suspiciousdomains_Low.txt -O $BASE/$FOLDER_BL/suspiciousdomains_Low.txt
-		wget -t 3 http://isc.sans.edu/feeds/suspiciousdomains_Medium.txt -O $BASE/$FOLDER_BL/suspiciousdomains_Medium.txt
-		wget -t 3 http://isc.sans.edu/feeds/suspiciousdomains_High.txt -O $BASE/$FOLDER_BL/suspiciousdomains_High.txt
+		wget -t 3 http://isc.sans.edu/feeds/suspiciousdomains_Medium.txt -O $BASE/$FOLDER_BL/suspiciousdomains_Medium.tmp
+		wget -t 3 http://isc.sans.edu/feeds/suspiciousdomains_High.txt -O $BASE/$FOLDER_BL/suspiciousdomains_High.tmp
 
 		#cat $BASE/$FOLDER_BL/suspiciousdomains_Low.txt | grep -v ^# | grep -v ^Site | sed '/^$/d' > $BASE/$FOLDER_BL/ISC.txt
-		cat $BASE/$FOLDER_BL/suspiciousdomains_Medium.txt | grep -v ^# | grep -v ^Site | sed '/^$/d' >> $BASE/$FOLDER_BL/ISC.txt
-		cat $BASE/$FOLDER_BL/suspiciousdomains_High.txt | grep -v ^# | grep -v ^Site | sed '/^$/d' >> $BASE/$FOLDER_BL/ISC.txt
+		cat $BASE/$FOLDER_BL/suspiciousdomains_Medium.tmp | grep -v ^# | grep -v ^Site | sed '/^$/d' >> $BASE/$FOLDER_BL/ISC.tmp
+		cat $BASE/$FOLDER_BL/suspiciousdomains_High.tmp | grep -v ^# | grep -v ^Site | sed '/^$/d' >> $BASE/$FOLDER_BL/ISC.tmp
 
-		cat $BASE/$FOLDER_BL/ISC.txt | grep -v "[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}" \
-			| sort | uniq | cut -d'?' -f1 >> $BASE/$FOLDER_BL/isc.tmp
+		cat $BASE/$FOLDER_BL/ISC.tmp | grep -v "[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}" \
+			| sort | uniq | cut -d'?' -f1 >> $BASE/$FOLDER_BL/isc2.tmp
 		cat $BASE/$FOLDER_BL/isc.tmp >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/suspiciousdomains_Low.txt  $BASE/$FOLDER_BL/suspiciousdomains_Medium.txt 
-		rm -rf $BASE/$FOLDER_BL/suspiciousdomains_High.txt $BASE/$FOLDER_BL/ISC.txt $BASE/$FOLDER_BL/isc.tmp
+		if [ $DELETE == 1 ]; then
+			rm -rf $BASE/$FOLDER_BL/suspiciousdomains_Low.tmp  $BASE/$FOLDER_BL/suspiciousdomains_Medium.tmp
+			rm -rf $BASE/$FOLDER_BL/suspiciousdomains_High.tmp $BASE/$FOLDER_BL/ISC.tmp $BASE/$FOLDER_BL/isc2.tmp
+		fi
 	fi
 	
 	
@@ -118,34 +122,34 @@ fi
 ## Malcode
 #################################
 	if [ $MALCODE -ne 0 ]; then
-		wget -t 3 http://malc0de.com/bl/ZONES -O $BASE/$FOLDER_BL/malcode.txt
-		more $BASE/$FOLDER_BL/malcode.txt | cut -d'"' -f2 | grep -v -E "//|^$|#" \
+		wget -t 3 http://malc0de.com/bl/ZONES -O $BASE/$FOLDER_BL/malcode.tmp
+		more $BASE/$FOLDER_BL/malcode.tmp | cut -d'"' -f2 | grep -v -E "//|^$|#" \
 			| cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/malcode.txt
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/malcode.tmp ; fi
 	fi
 
 #################################
 ## Sucuri
 #################################
 	if [ $SUCURI -ne 0 ]; then
-		wget -t 3 http://labs.sucuri.net/?malware -O $BASE/$FOLDER_BL/index_sucuri.html
-		more $BASE/$FOLDER_BL/index_sucuri.html | sed 's/iframe/\n\r/g; s/redirections/\n\r/g; s/javascript/\n\r/g'| awk '{ print $3 }' \
+		wget -t 3 http://labs.sucuri.net/?malware -O $BASE/$FOLDER_BL/index_sucuri.tmp
+		more $BASE/$FOLDER_BL/index_sucuri.tmp | sed 's/iframe/\n\r/g; s/redirections/\n\r/g; s/javascript/\n\r/g'| awk '{ print $3 }' \
 			| tr = " " | tr \" " " | awk '{ print $3 }' | sed '/td><td/d; /^$/d' \
-			| grep -v -E "><|>|<" | cut -d'?' -f1 >> $BASE/$FOLDER_BL/sucuri.txt
-		cat $BASE/$FOLDER_BL/sucuri.txt >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/sucuri.txt $BASE/$FOLDER_BL/index_sucuri.html
+			| grep -v -E "><|>|<" | cut -d'?' -f1 >> $BASE/$FOLDER_BL/sucuri.tmp
+		cat $BASE/$FOLDER_BL/sucuri.tmp >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/sucuri.tmp $BASE/$FOLDER_BL/index_sucuri.tmp ; fi
 	fi
 
 #################################
 ## Malware blacklist
 #################################
 	if [ $MALWAREBLACKLIST -ne 0 ]; then
-		wget -t 3 www.malwareblacklist.com/mbl.xml -O $BASE/$FOLDER_BL/mbl.xml
-		cat mbl.xml | grep Host: | sed 's/http://g' | tr \/ " " | awk '{ print $2 }' | sort | uniq \
+		wget -t 3 www.malwareblacklist.com/mbl.xml -O $BASE/$FOLDER_BL/malwareblacklist.xml.tmp
+		cat malwareblacklist.xml.tmp | grep Host: | sed 's/http://g' | tr \/ " " | awk '{ print $2 }' | sort | uniq \
 			| grep -v "[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}" \
-			| sed 's/\:[0-9 ].*//' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/malwareblacklist.txt
-		cat $BASE/$FOLDER_BL/malwareblacklist.txt >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/mbl.xml $BASE/$FOLDER_BL/malwareblacklist.txt
+			| sed 's/\:[0-9 ].*//' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/malwareblacklist.tmp
+		cat $BASE/$FOLDER_BL/malwareblacklist.tmp >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/malwareblacklist.xml.tmp $BASE/$FOLDER_BL/malwareblacklist.tmp ; fi
 	fi
 
 ##################################################################################
@@ -155,10 +159,10 @@ fi
 	if [ $MALWAREPATROL -ne 0 ]; then
 		wget -t 3 http://www.malwarepatrol.net/cgi/submit?action=list_bind -O $BASE/$FOLDER_BL/malwarepatrol.tmp
 		cat $BASE/$FOLDER_BL/malwarepatrol.tmp | awk '{ print $2 }' | sed 's/\"//g' \
-			| sed '/^$/d' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/malwarepatrol.txt
+			| sed '/^$/d' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/malwarepatrol2.tmp
 
-		cat $BASE/$FOLDER_BL/malwarepatrol.txt >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/malwarepatrol.txt $BASE/$FOLDER_BL/malwarepatrol.tmp
+		cat $BASE/$FOLDER_BL/malwarepatrol2.tmp >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/malwarepatrol.tmp $BASE/$FOLDER_BL/malwarepatrol2.tmp ; fi
 	fi
 
 ##################################################################################
@@ -170,10 +174,10 @@ fi
 	if [ $MTC_SRI -ne 0 ]; then
 		wget -t 3 http://mtc.sri.com/live_data/malware_dns/ -O $BASE/$FOLDER_BL/sri.com.tmp
 		cat $BASE/$FOLDER_BL/sri.com.tmp | grep -A 1 img | grep -E -v "img|--"  \
-			| sed 's/<td>//g; s/<\/td>//g;' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/sri.com.txt
+			| sed 's/<td>//g; s/<\/td>//g;' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/sri.com2.tmp
 
 		cat $BASE/$FOLDER_BL/sri.com.txt >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/sri.com.tmp $BASE/$FOLDER_BL/sri.com.txt
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/sri.com.tmp $BASE/$FOLDER_BL/sri.com2.tmp ; fi
 	fi
 
   ##################################################################################
@@ -183,9 +187,9 @@ fi
   ##################################################################################
 	# Download Exposure malicious DNS Names
 	if [ $ISECLAB -ne 0 ]; then
-		wget -t 3 http://exposure.iseclab.org/malware_domains.txt -O $BASE/$FOLDER_BL/iseclab.org.txt
-		cat $BASE/$FOLDER_BL/iseclab.org.txt | sed '/^$/d' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/iseclab.org.txt
+		wget -t 3 http://exposure.iseclab.org/malware_domains.txt -O $BASE/$FOLDER_BL/iseclab.org.tmp
+		cat $BASE/$FOLDER_BL/iseclab.org.tmp | sed '/^$/d' | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/iseclab.org.tmp ; fi
 	fi
 
 ##########################################
@@ -197,17 +201,16 @@ fi
 		more $BASE/$FOLDER_BL/clean.mx.txt | grep CDATA | cut -d'/' -f3 | cut -d']' -f1 |grep -v ':' \
 		 | grep -v "[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}\.[[:digit:]]\{1,3\}" \
 		 | sort | uniq | cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		 rm -rf $BASE/$FOLDER_BL/clean.mx.txt
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/clean.mx.txt ; fi
 	fi
-
 #########################################################
 #######   http://www.nictasoft.com/ace/malware-urls/
 #########################################################
 	if [ $NICTASOFT -ne 0 ]; then
-		wget -t 3 http://www.nictasoft.com/ace/malware-urls/ -O $BASE/$FOLDER_BL/nictasoft.txt
-		more $BASE/$FOLDER_BL/nictasoft.txt | grep -E "href" | grep "td" | cut -d'>' -f3 | cut -d'/' -f3 \
+		wget -t 3 http://www.nictasoft.com/ace/malware-urls/ -O $BASE/$FOLDER_BL/nictasoft.tmp
+		more $BASE/$FOLDER_BL/nictasoft.tmp | grep -E "href" | grep "td" | cut -d'>' -f3 | cut -d'/' -f3 \
 			| cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
-		rm -rf $BASE/$FOLDER_BL/nictasoft.txt
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/nictasoft.tmp ; fi
 	fi
 
 
@@ -217,15 +220,6 @@ cat $BASE/$FOLDER_BL/master.list | grep -v '<' | grep -v '>' | grep -v '#' | gre
 	| sed '/^$/d' | grep -v -E "\.$" > $BASE/$FOLDER_BL/master.list.tmp
 rm -rf $BASE/$FOLDER_BL/master.list
 mv $BASE/$FOLDER_BL/master.list.tmp $BASE/$FOLDER_BL/master.list
-
-#rm -rf $BASE/$FOLDER_BL/tmpfile.txt
-#touch $BASE/$FOLDER_BL/tmpfile.txt
-#for b in `cat $BASE/$FOLDER_BL/master.list`; do
-#        lines=`grep -i $b $BASE/$FOLDER_BL/tmpfile.txt | wc -l`
-#        if [ $lines -eq 0 ]; then
-#                echo $b >> $BASE/$FOLDER_BL/tmpfile.txt
-#        fi
-#done
 
 ##
 ## Outputting. Either in BIND format or UNBOUND format
@@ -243,5 +237,3 @@ elif [ $DNSSERVER == 'unbound' ]; then
 	done
 	echo "Configuration file generated : $BASE/$FOLDER_BL/blacklisted_domains.conf"
 fi
-
-rm -rf $BASE/$FOLDER_BL/tmpfile.txt
