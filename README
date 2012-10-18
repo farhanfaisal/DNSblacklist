@@ -22,4 +22,3 @@ The main script is preparation.sh, which generate a configuration
 file for unbound DNS server. You can choose BIND format output as well
 
 Farhan Faisal
-http://www.farhanfaisal.com
