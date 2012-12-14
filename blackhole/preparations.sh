@@ -221,6 +221,9 @@ cat $BASE/$FOLDER_BL/master.list | grep -v '<' | grep -v '>' | grep -v '#' | gre
 rm -rf $BASE/$FOLDER_BL/master.list
 mv $BASE/$FOLDER_BL/master.list.tmp $BASE/$FOLDER_BL/master.list
 
+cat $BASE/$FOLDER_BL/tmp.blacklist  >> $BASE/$FOLDER_BL/master.list
+
+
 ##
 ## Outputting. Either in BIND format or UNBOUND format
 ##
@@ -237,3 +240,6 @@ elif [ $DNSSERVER == 'unbound' ]; then
 	done
 	echo "Configuration file generated : $BASE/$FOLDER_BL/blacklisted_domains.conf"
 fi
+
+
+$BASE/$FOLDER_BL/whitelist_checker.sh
