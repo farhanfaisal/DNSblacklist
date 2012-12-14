@@ -208,8 +208,9 @@ fi
 #########################################################
 	if [ $NICTASOFT -ne 0 ]; then
 		wget -t 3 http://www.nictasoft.com/ace/malware-urls/ -O $BASE/$FOLDER_BL/nictasoft.tmp
-		more $BASE/$FOLDER_BL/nictasoft.tmp | grep -E "href" | grep "td" | cut -d'>' -f3 | cut -d'/' -f3 \
-			| cut -d'?' -f1 >> $BASE/$FOLDER_BL/master.list
+		more $BASE/$FOLDER_BL/nictasoft.tmp | grep -E "href" | grep "td" | cut -d'>' -f4 | cut -d'/' -f3 \
+			| cut -d'?' -f1 | grep -v -E "\.\.\.|nictasoft" | cut -d'<' -f 1 | cut -d':' -f1 \
+			| sort | uniq >> $BASE/$FOLDER_BL/master.list
 		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/nictasoft.tmp ; fi
 	fi
 
