@@ -13,6 +13,7 @@ This include domain parser from various malicious domain provider
 - http://mtc.sri.com/live_data/malware_dns/
 - http://exposure.iseclab.org/malware_domains.txt
 - http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive
+- http://www.nictasoft.com/ace/malware-urls/
 
 Main features
 - Configurables of which domain sources to be used.
@@ -20,5 +21,12 @@ Main features
 
 The main script is preparation.sh, which generate a configuration 
 file for unbound DNS server. You can choose BIND format output as well
+
+How to use
+ - Pull to /etc/unbound/
+ - Edit /etc/unbound/unbound.conf according to your server environment. (Note the reference to "/etc/unbound/blackhole/blacklisted_domains.conf")
+ - Run preparation.sh in /etc/unbound/blackhole/. Your "/etc/unbound/blackhole/blacklisted_domains.conf" will be created automatically.
+ - run unbound-checkconf to verify the config file
+ - Restart unbound for the config file to be effective.
 
 Farhan Faisal
