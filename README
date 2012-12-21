@@ -1,4 +1,9 @@
-DNSBlacklist project. 
+DNSBlacklist project.
+
+Introduction.
+	This project aims to be an assisting tool to setup your own DNS blacklisting in your enterprise environment. While the DNS provide 
+	blacklisting service, it will provide a good and fast caching for the enterprise DNS use. This tool will retrieve latest known 
+	malicious domains, and generate configuration file for BIND or UNBOUND DNS server.
 
 This include domain parser from various malicious domain provider
 - http://www.malwaredomains.com/
