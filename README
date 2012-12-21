@@ -19,6 +19,7 @@ This include domain parser from various malicious domain provider
 - http://exposure.iseclab.org/malware_domains.txt
 - http://support.clean-mx.de/clean-mx/xmlviruses?format=xml&fields=review,url&response=alive
 - http://www.nictasoft.com/ace/malware-urls/
+- http://mirror1.malwaredomains.com/files/spywaredomains.zones
 
 Main features
 - Configurables of which domain sources to be used.

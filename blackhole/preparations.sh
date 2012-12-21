@@ -35,6 +35,9 @@ ISECLAB=1
 CLEANMX=0
 #	http://www.nictasoft.com/ace/malware-urls/
 NICTASOFT=1
+#	http://mirror1.malwaredomains.com/files/spywaredomains.zones
+MALWAREDOMAINS_SPY=1
+
 
 ## Choose which DNS server are you using, BIND of UNBOUND
 DNSSERVER="unbound" # bind or unbound
@@ -213,7 +216,15 @@ fi
 			| sort | uniq >> $BASE/$FOLDER_BL/master.list
 		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/nictasoft.tmp ; fi
 	fi
-
+#########################################################
+#######   http://mirror1.malwaredomains.com/files/spywaredomains.zones
+#########################################################
+	if [ $MALWAREDOMAINS_SPY -ne 0 ]; then
+		wget -t 3 "http://mirror1.malwaredomains.com/files/spywaredomains.zones" -O $BASE/$FOLDER_BL/malwaredomains_spy.tmp
+		cat $BASE/$FOLDER_BL/malwaredomains_spy.tmp | cut -d'"' -f2 | cut -d'"' -f1 | grep -v '//' | sort \
+		 | uniq >> $BASE/$FOLDER_BL/master.list
+		if [ $DELETE == 1 ]; then rm -rf $BASE/$FOLDER_BL/malwaredomains_spy.tmp ; fi
+	fi
 
 
 ## refining records.. remove rubbish.. files are the same..
