@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dns_config_file="blacklisted_domains.conf"
+dns_config_file="/etc/unbound/blackhole/blacklisted_domains.conf"
 
 
 if [ ! -f tmp.whitelist ]; then
