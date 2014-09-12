@@ -48,5 +48,4 @@ How to use
  - Restart unbound for the config file to be effective.
 
 
-
-Farhan Faisal @2014
+@2014
