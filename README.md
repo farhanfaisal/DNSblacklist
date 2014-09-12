@@ -1,6 +1,6 @@
-DNSBlacklist project.
+#DNSBlacklist project.
 
-Introduction.
+##Introduction.
 	This project aims to be an assisting tool to setup your own DNS blacklisting in your enterprise 
 	environment. While the DNS provide blacklisting service, it will provide a good and fast caching 
 	for the enterprise DNS use. This tool will retrieve latest known malicious domains, and 
@@ -8,7 +8,7 @@ Introduction.
 
 	This script utilizing unbound as local recursive DNS server for your environment.
 
-How works
+##How it works
 
 	The script will pull malicious domains from various sources, to be configured in an unbound/bind 
 	DNS server. This server will be your internal DNS server in your environment. Any DNS request
@@ -32,7 +32,7 @@ This include domain parser from various malicious domain provider
 - http://www.nictasoft.com/ace/malware-urls/
 - http://mirror1.malwaredomains.com/files/spywaredomains.zones
 
-Main features
+##Main features
 - Configurables of which domain sources to be used.
 - Option for output format, Unbound or Bind DNS server (Unbound by default)
 - Domain permanent whitelisting and blacklisting
@@ -40,7 +40,7 @@ Main features
 The main script is preparation.sh, which generate a configuration 
 file for unbound DNS server. You can choose BIND format output as well
 
-How to use
+##How to use
  - Pull to /etc/unbound/
  - Edit /etc/unbound/unbound.conf according to your server environment. (Note the reference to "/etc/unbound/blackhole/blacklisted_domains.conf")
  - Run preparation.sh in /etc/unbound/blackhole/. Your "/etc/unbound/blackhole/blacklisted_domains.conf" will be created automatically.
@@ -48,4 +48,4 @@ How to use
  - Restart unbound for the config file to be effective.
 
 
-@2014
+####@2014
